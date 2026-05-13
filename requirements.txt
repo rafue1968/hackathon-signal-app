@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+firebase-admin
+httpx
+apscheduler
+python-dotenv
+twilio
+pydantic
