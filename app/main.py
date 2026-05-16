@@ -1,5 +1,8 @@
 from fastapi import FastAPI
 from app.models.event import Event
+from app.engine.matcher import match_event
+from app.pipeline.event_pipeline import process_event
+from app.services.services import get_user_preferences
 
 app = FastAPI()
 
@@ -23,7 +26,7 @@ def send_signal(payload: dict):
         "data": payload
     }
 
-@app.post("/events/test")
+@app.get("/events/test")
 async def test_event():
     return {
         "event": "AI Hackathon",
@@ -33,4 +36,22 @@ async def test_event():
 
 @app.post("/events")
 async def create_event(event: Event):
-    return {"Received": event.model_dump()}
+
+    user_preferences = ["AI", "Cybersecurity", "Tech"]
+
+    matched = match_event(event, user_preferences)
+
+    return {
+        "Received": event.model_dump(),
+        "matched": matched
+        
+    }
+
+
+@app.post("/events/{user_id}")
+async def create_event(user_id: str, event: Event):
+    preferences = get_user_preferences(user_id)
+
+    result = process_event(event, preferences)
+
+    return result
